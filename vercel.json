@@ -1,0 +1,82 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": {
+      "description": "Supabase Project URL"
+    },
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": {
+      "description": "Supabase Anonymous Key"
+    },
+    "SUPABASE_SERVICE_ROLE_KEY": {
+      "description": "Supabase Service Role Key"
+    },
+    "NEXT_PUBLIC_APP_URL": {
+      "description": "Application URL"
+    },
+    "NEXT_PUBLIC_APP_NAME": {
+      "description": "Application Name"
+    },
+    "NEXT_PUBLIC_STRIPE_PUBLIC_KEY": {
+      "description": "Stripe Public Key"
+    },
+    "STRIPE_SECRET_KEY": {
+      "description": "Stripe Secret Key"
+    },
+    "STRIPE_WEBHOOK_SECRET": {
+      "description": "Stripe Webhook Secret"
+    },
+    "SMTP_HOST": {
+      "description": "SMTP Host"
+    },
+    "SMTP_PORT": {
+      "description": "SMTP Port"
+    },
+    "SMTP_USER": {
+      "description": "SMTP User"
+    },
+    "SMTP_PASSWORD": {
+      "description": "SMTP Password"
+    },
+    "SMTP_SECURE": {
+      "description": "SMTP Secure"
+    },
+    "SMTP_FROM": {
+      "description": "SMTP From Email"
+    }
+  },
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    }
+  ]
+}
