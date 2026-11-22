@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth';
 /**
  * GET /api/dashboard/activity - Atividades recentes de todas as campanhas
  */
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     await requireAdmin();
 
@@ -35,7 +35,7 @@ export async function GET(request: Request) {
 
     // Mescla e ordena por data
     const activities = [
-      ...recentReceitas.map((r) => ({
+      ...(recentReceitas || []).map((r) => ({
         id: `receita-${r.id}`,
         type: 'receita',
         title: `Doação de R$ ${r.amount.toFixed(2)}`,
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
         campaignId: r.campaign_id,
         timestamp: r.created_at,
       })),
-      ...recentDespesas.map((d) => ({
+      ...(recentDespesas || []).map((d) => ({
         id: `despesa-${d.id}`,
         type: 'despesa',
         title: `Gasto de R$ ${d.amount.toFixed(2)}`,
@@ -51,7 +51,7 @@ export async function GET(request: Request) {
         campaignId: d.campaign_id,
         timestamp: d.created_at,
       })),
-      ...recentDoacoes.map((d) => ({
+      ...(recentDoacoes || []).map((d) => ({
         id: `doacao-${d.id}`,
         type: 'doacao',
         title: `Doação de ${d.quantity} ${d.item_name}`,

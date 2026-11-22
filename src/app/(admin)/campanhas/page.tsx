@@ -5,12 +5,10 @@ import { useCampanhas } from '@/hooks/useCampanhas';
 import { CampanhaForm } from '@/components/admin/CampanhaForm';
 import { CampanhaList } from '@/components/admin/CampanhaList';
 import { CampaignInput } from '@/lib/validators';
-import { useRouter } from 'next/navigation';
 
 type ModalMode = 'none' | 'create' | 'edit';
 
 export default function CampanhasPage() {
-  const router = useRouter();
   const { campanhas, isLoading, error, createCampanha, updateCampanha, deleteCampanha, getCampanha } =
     useCampanhas();
   const [modalMode, setModalMode] = useState<ModalMode>('none');

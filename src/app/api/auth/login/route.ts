@@ -6,9 +6,9 @@ import { loginSchema } from '@/lib/validators';
 
 const bcrypt = require('bcryptjs');
 
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await _request.json();
 
     // Valida com Zod
     const data = loginSchema.parse(body);

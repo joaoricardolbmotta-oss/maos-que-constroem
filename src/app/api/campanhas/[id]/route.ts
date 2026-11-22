@@ -7,7 +7,7 @@ import { campaignSchema } from '@/lib/validators';
 /**
  * GET /api/campanhas/:id - Obter detalhes de campanha
  */
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = supabaseServer();
 
@@ -31,12 +31,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 /**
  * PUT /api/campanhas/:id - Atualizar campanha
  */
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Verifica autenticação de admin
     await requireAdmin();
 
-    const body = await request.json();
+    const body = await _request.json();
     const data = campaignSchema.parse(body);
 
     const supabase = supabaseServer();
@@ -114,7 +114,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 /**
  * DELETE /api/campanhas/:id - Deletar campanha
  */
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // Verifica autenticação de admin
     await requireAdmin();

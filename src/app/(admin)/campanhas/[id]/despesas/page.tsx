@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useDespesas } from '@/hooks/useDespesas';
 import { DespesaForm } from '@/components/admin/DespesaForm';
@@ -11,9 +11,8 @@ import { DespesaInput } from '@/lib/validators';
 type ModalMode = 'none' | 'create' | 'edit';
 
 export default function DespesasPage() {
-  const router = useRouter();
   const params = useParams();
-  const campaignId = params.id as string;
+  const campaignId = params['id'] as string;
 
   const { despesas, isLoading, error, createDespesa, updateDespesa, deleteDespesa } =
     useDespesas(campaignId);

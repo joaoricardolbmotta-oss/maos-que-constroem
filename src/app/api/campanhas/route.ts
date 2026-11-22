@@ -8,9 +8,9 @@ import { campaignSchema } from '@/lib/validators';
  * GET /api/campanhas - Lista campanhas
  * Query: ?status=draft|planned|active|finished
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
+    const searchParams = _request.nextUrl.searchParams;
     const status = searchParams.get('status');
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -58,12 +58,12 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/campanhas - Criar campanha
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     // Verifica autenticação de admin
     await requireAdmin();
 
-    const body = await request.json();
+    const body = await _request.json();
     const data = campaignSchema.parse(body);
 
     const supabase = supabaseServer();

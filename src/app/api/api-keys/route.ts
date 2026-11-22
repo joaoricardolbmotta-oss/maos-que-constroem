@@ -16,7 +16,7 @@ function generateApiKey(): string {
 /**
  * GET /api/api-keys - Lista chaves de API do usuário
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const user = await requireAuth();
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('api_keys')
       .select('id, name, key_prefix, scopes, created_at, last_used_at, active')
-      .eq('user_id', user.id)
+      .eq('user_id', (user as any).id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -42,11 +42,11 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/api-keys - Criar nova chave de API
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    const body = await request.json();
+    const body = await _request.json();
     const data = createKeySchema.parse(body);
 
     const supabase = supabaseServer();
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       .from('api_keys')
       .insert([
         {
-          user_id: user.id,
+          user_id: (user as any).id,
           name: data.name,
           key_hash: hashedKey,
           key_prefix: keyPrefix,
@@ -104,11 +104,11 @@ export async function POST(request: NextRequest) {
 /**
  * DELETE /api/api-keys/:id - Revogar chave
  */
-export async function DELETE(request: NextRequest) {
+export async function DELETE(_request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(_request.url);
     const id = searchParams.get('id');
 
     if (!id) {
@@ -121,7 +121,7 @@ export async function DELETE(request: NextRequest) {
       .from('api_keys')
       .select('id')
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', (user as any).id)
       .single();
 
     if (!existing) {

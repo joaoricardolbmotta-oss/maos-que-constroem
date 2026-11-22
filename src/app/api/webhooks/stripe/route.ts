@@ -18,10 +18,8 @@ export async function POST(request: NextRequest) {
 
     if (webhookResult.type === 'payment_succeeded') {
       const paymentIntent = webhookResult.data;
-      const campaignId = paymentIntent.metadata?.campaign_id;
-      const donorName = paymentIntent.metadata?.donor_name;
-      const donorEmail = paymentIntent.metadata?.donor_email;
-      const donorCpf = paymentIntent.metadata?.donor_cpf;
+      const campaignId = paymentIntent.metadata?.['campaign_id'];
+      const donorName = paymentIntent.metadata?.['donor_name'];
 
       if (campaignId) {
         const supabase = supabaseServer();

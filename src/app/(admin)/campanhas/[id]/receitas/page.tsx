@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useReceitas } from '@/hooks/useReceitas';
 import { ReceitaForm } from '@/components/admin/ReceitaForm';
@@ -11,9 +11,8 @@ import { ReceitaInput } from '@/lib/validators';
 type ModalMode = 'none' | 'create' | 'edit';
 
 export default function ReceitasPage() {
-  const router = useRouter();
   const params = useParams();
-  const campaignId = params.id as string;
+  const campaignId = params['id'] as string;
 
   const { receitas, isLoading, error, createReceita, updateReceita, deleteReceita } =
     useReceitas(campaignId);

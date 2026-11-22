@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth';
 /**
  * GET /api/dashboard/stats - Estatísticas globais
  */
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     await requireAdmin();
 
@@ -26,26 +26,26 @@ export async function GET(request: Request) {
     // Calcula estatísticas
     const stats = {
       campanhas: {
-        total: campanhas.length,
-        ativas: campanhas.filter((c) => c.status === 'active').length,
-        planejadas: campanhas.filter((c) => c.status === 'planned').length,
-        rascunhos: campanhas.filter((c) => c.status === 'draft').length,
+        total: (campanhas || []).length,
+        ativas: (campanhas || []).filter((c) => c.status === 'active').length,
+        planejadas: (campanhas || []).filter((c) => c.status === 'planned').length,
+        rascunhos: (campanhas || []).filter((c) => c.status === 'draft').length,
       },
       receitas: {
-        total: receitas.length,
-        totalArrecadado: receitas.reduce((sum, r) => sum + r.amount, 0),
-        mediaDoacao: receitas.length > 0 ? receitas.reduce((sum, r) => sum + r.amount, 0) / receitas.length : 0,
+        total: (receitas || []).length,
+        totalArrecadado: (receitas || []).reduce((sum, r) => sum + r.amount, 0),
+        mediaDoacao: (receitas || []).length > 0 ? (receitas || []).reduce((sum, r) => sum + r.amount, 0) / (receitas || []).length : 0,
       },
       despesas: {
-        total: despesas.length,
-        totalGasto: despesas.reduce((sum, d) => sum + d.amount, 0),
-        mediaGasto: despesas.length > 0 ? despesas.reduce((sum, d) => sum + d.amount, 0) / despesas.length : 0,
+        total: (despesas || []).length,
+        totalGasto: (despesas || []).reduce((sum, d) => sum + d.amount, 0),
+        mediaGasto: (despesas || []).length > 0 ? (despesas || []).reduce((sum, d) => sum + d.amount, 0) / (despesas || []).length : 0,
       },
       doacoes: {
-        total: doacoes.length,
-        categorias: Array.from(new Set(doacoes.map((d) => d.category))).length,
+        total: (doacoes || []).length,
+        categorias: Array.from(new Set((doacoes || []).map((d) => d.category))).length,
       },
-      saldo: receitas.reduce((sum, r) => sum + r.amount, 0) - despesas.reduce((sum, d) => sum + d.amount, 0),
+      saldo: (receitas || []).reduce((sum, r) => sum + r.amount, 0) - (despesas || []).reduce((sum, d) => sum + d.amount, 0),
     };
 
     return NextResponse.json(stats, { status: 200 });
