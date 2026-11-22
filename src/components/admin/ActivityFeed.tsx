@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { formatDate } from '@/lib/date';
 
 interface Activity {
   id: string;
@@ -106,7 +105,7 @@ export function ActivityFeed() {
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-slate-900 truncate">{activity.title}</p>
               <p className="text-xs text-slate-600 truncate">{activity.description}</p>
-              <p className="text-xs text-slate-500 mt-1">{formatDate(activity.timestamp)}</p>
+              <p className="text-xs text-slate-500 mt-1">{new Date(activity.timestamp).toLocaleDateString()}</p>
             </div>
           </div>
         </div>
