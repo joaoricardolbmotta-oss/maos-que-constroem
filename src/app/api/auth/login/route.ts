@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { supabaseServer } from '@/lib/supabase';
+import pb from '@/lib/pocketbase';
 import { setAuthCookie } from '@/lib/auth';
 import { loginSchema } from '@/lib/validators';
 
@@ -13,46 +13,41 @@ export async function POST(_request: NextRequest) {
     // Valida com Zod
     const data = loginSchema.parse(body);
 
-    const supabase = supabaseServer();
-
-    // Busca usuário no banco
-    const { data: users, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', data.email)
-      .single();
-
-    if (userError || !users) {
+    // Busca usuário no banco (PocketBase)
+    let user;
+    try {
+      user = await pb.collection('users').getFirstListItem(`email="${data.email}"`);
+    } catch {
       return NextResponse.json({ error: 'Email ou senha inválidos' }, { status: 401 });
     }
 
-    if (!users.is_active) {
+    if (!user.is_active) {
       return NextResponse.json({ error: 'Usuário inativo' }, { status: 403 });
     }
 
     // Compara senha
-    const passwordMatch = await bcrypt.compare(data.password, users.password_hash);
+    const passwordMatch = await bcrypt.compare(data.password, user.password_hash);
 
     if (!passwordMatch) {
       return NextResponse.json({ error: 'Email ou senha inválidos' }, { status: 401 });
     }
 
     // Atualiza last_login_at
-    await supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', users.id);
+    await pb.collection('users').update(user.id, { last_login_at: new Date().toISOString() });
 
     // Cria token JWT (simples - em produção usar jose ou jwt library)
     const token = Buffer.from(
       JSON.stringify({
-        sub: users.id,
-        email: users.email,
-        role: users.role,
+        sub: user.id,
+        email: user.email,
+        role: user.role,
         iat: Math.floor(Date.now() / 1000),
         exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7, // 7 dias
       })
     ).toString('base64');
 
     // Remove password_hash da resposta
-    const { password_hash, ...userWithoutPassword } = users;
+    const { password_hash, ...userWithoutPassword } = user;
 
     // Salva em cookies
     await setAuthCookie({

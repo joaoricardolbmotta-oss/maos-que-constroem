@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { supabaseServer } from '@/lib/supabase';
+import pb from '@/lib/pocketbase';
 import { requireAdmin } from '@/lib/auth';
 import { campaignSchema } from '@/lib/validators';
 
@@ -15,34 +15,32 @@ export async function GET(_request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const supabase = supabaseServer();
-
-    let query = supabase.from('campanhas').select('*', { count: 'exact' });
-
-    // Filtrar por status se fornecido
+    // Build filter
+    let filter = '';
     if (status) {
-      query = query.eq('status', status);
+      filter = `status="${status}"`;
     }
 
     // Pagination
-    const from = (page - 1) * limit;
-    query = query.range(from, from + limit - 1);
+    const skip = (page - 1) * limit;
 
-    // Ordenar por data descrescente
-    query = query.order('action_date', { ascending: false }).order('id', { ascending: false });
+    // Get total count
+    const allCampanhas = await pb.collection('campanhas').getFullList({
+      filter,
+    });
+    const count = allCampanhas.length;
+    const totalPages = Math.ceil(count / limit);
 
-    const { data, error, count } = await query;
-
-    if (error) {
-      throw error;
-    }
-
-    const totalPages = count ? Math.ceil(count / limit) : 0;
+    // Get paginated results with sort
+    const data = await pb.collection('campanhas').getList(page, limit, {
+      filter,
+      sort: '-action_date,-id',
+    });
 
     return NextResponse.json(
       {
-        campanhas: data,
-        total: count || 0,
+        campanhas: data.items,
+        total: count,
         page,
         limit,
         pages: totalPages,
@@ -66,42 +64,27 @@ export async function POST(_request: NextRequest) {
     const body = await _request.json();
     const data = campaignSchema.parse(body);
 
-    const supabase = supabaseServer();
-
     // Verifica se slug já existe
-    const { data: existing } = await supabase
-      .from('campanhas')
-      .select('id')
-      .eq('public_slug', data.public_slug)
-      .single();
-
-    if (existing) {
+    try {
+      await pb.collection('campanhas').getFirstListItem(`public_slug="${data.public_slug}"`);
       return NextResponse.json({ error: 'Slug já existe' }, { status: 409 });
+    } catch {
+      // Slug não existe, prossegue
     }
 
     // Cria campanha
-    const { data: campanha, error } = await supabase
-      .from('campanhas')
-      .insert([
-        {
-          title: data.title,
-          description: data.description || null,
-          institution: data.institution,
-          public_slug: data.public_slug,
-          date_mode: data.date_mode,
-          action_date: data.action_date || null,
-          end_date: data.end_date || null,
-          fundraising_goal: data.fundraising_goal || null,
-          status: data.status,
-          estimated_audience: data.estimated_audience || null,
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      throw error;
-    }
+    const campanha = await pb.collection('campanhas').create({
+      title: data.title,
+      description: data.description || '',
+      institution: data.institution,
+      public_slug: data.public_slug,
+      date_mode: data.date_mode,
+      action_date: data.action_date || null,
+      end_date: data.end_date || null,
+      fundraising_goal: data.fundraising_goal || null,
+      status: data.status,
+      estimated_audience: data.estimated_audience || null,
+    });
 
     return NextResponse.json({ campanha }, { status: 201 });
   } catch (error) {
