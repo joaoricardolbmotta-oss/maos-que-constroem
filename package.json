@@ -9,9 +9,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "db:push": "prisma db push",
+    "setup:pocketbase": "ts-node scripts/setup-pocketbase.ts",
+    "test:local": "bash scripts/test-local.sh",
     "db:seed": "ts-node scripts/seed.ts",
-    "migration:create": "supabase migration new",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
