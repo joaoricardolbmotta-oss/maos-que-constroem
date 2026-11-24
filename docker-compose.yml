@@ -1,17 +1,39 @@
 version: '3.8'
 
 services:
+  # PocketBase - Backend com Database, Auth e Real-time
+  pocketbase:
+    image: ghcr.io/pocketbase/pocketbase:latest
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./pb_data:/pb/pb_data
+      - ./pb_migrations:/pb/migrations
+    environment:
+      PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:-your-secret-key-change-in-production}
+    command: >
+      serve --http=0.0.0.0:8090
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8090/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Next.js App
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    depends_on:
+      pocketbase:
+        condition: service_healthy
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      NEXT_PUBLIC_POCKETBASE_URL: http://pocketbase:8090
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NEXT_PUBLIC_API_URL: http://localhost:3000
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
@@ -25,16 +47,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # Optional: Uncomment to run with local Supabase
-  # supabase:
-  #   image: supabase/supabase:latest
-  #   environment:
-  #     POSTGRES_DB: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - ./supabase_data:/var/lib/postgresql/data
-
 volumes:
-  supabase_data:
+  pb_data:
+  pb_migrations:
