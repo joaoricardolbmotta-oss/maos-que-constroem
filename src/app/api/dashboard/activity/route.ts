@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase';
+
 import { requireAdmin } from '@/lib/auth';
 
 /**
@@ -9,7 +9,8 @@ export async function GET(_request: Request) {
   try {
     await requireAdmin();
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
     const limit = 20;
 
     // Busca receitas recentes

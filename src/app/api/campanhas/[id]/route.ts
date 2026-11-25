@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { supabaseServer } from '@/lib/supabase';
+
 import { requireAdmin } from '@/lib/auth';
 import { campaignSchema } from '@/lib/validators';
 
@@ -9,7 +9,8 @@ import { campaignSchema } from '@/lib/validators';
  */
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     const { data, error } = await supabase
       .from('campanhas')
@@ -39,7 +40,8 @@ export async function PUT(_request: NextRequest, { params }: { params: { id: str
     const body = await _request.json();
     const data = campaignSchema.parse(body);
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     // Verifica se campanha existe
     const { data: existing } = await supabase
@@ -119,7 +121,8 @@ export async function DELETE(_request: NextRequest, { params }: { params: { id: 
     // Verifica autenticação de admin
     await requireAdmin();
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     // Verifica se campanha existe
     const { data: existing } = await supabase

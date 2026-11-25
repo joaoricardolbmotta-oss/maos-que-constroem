@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { supabaseServer } from '@/lib/supabase';
+
 import { requireAuth } from '@/lib/auth';
 import { randomBytes } from 'crypto';
 
@@ -20,7 +20,8 @@ export async function GET(_request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     const { data, error } = await supabase
       .from('api_keys')
@@ -49,7 +50,8 @@ export async function POST(_request: NextRequest) {
     const body = await _request.json();
     const data = createKeySchema.parse(body);
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     const apiKey = generateApiKey();
     const keyPrefix = apiKey.substring(0, 20);
@@ -115,7 +117,8 @@ export async function DELETE(_request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 });
     }
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     const { data: existing } = await supabase
       .from('api_keys')

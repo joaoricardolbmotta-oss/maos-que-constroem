@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabase';
+
 import { handleStripeWebhook } from '@/lib/stripe';
 
 /**
@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
       const donorCpf = paymentIntent.metadata?.['donor_cpf'];
 
       if (campaignId) {
-        const supabase = supabaseServer();
+        import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
         // Cria receita automaticamente
         await supabase.from('receitas').insert([

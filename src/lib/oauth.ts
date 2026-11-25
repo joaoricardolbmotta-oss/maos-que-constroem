@@ -1,4 +1,4 @@
-import { supabaseClient } from '@/lib/supabase';
+
 
 export const googleOAuthConfig = {
   clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,

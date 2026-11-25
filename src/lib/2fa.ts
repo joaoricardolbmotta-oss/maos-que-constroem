@@ -1,4 +1,4 @@
-import { supabaseServer } from '@/lib/supabase';
+
 
 /**
  * Two-Factor Authentication (2FA) com TOTP
@@ -15,7 +15,8 @@ export async function enable2FA(userId: string) {
       length: 32,
     });
 
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     // Salva secret no banco (não verificado ainda)
     await supabase.from('user_2fa').upsert([
@@ -40,7 +41,8 @@ export async function enable2FA(userId: string) {
 export async function verify2FA(userId: string, token: string) {
   try {
     const speakeasy = require('speakeasy');
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     // Busca secret
     const { data: twoFA } = await supabase
@@ -80,7 +82,8 @@ export async function verify2FA(userId: string, token: string) {
 
 export async function disable2FA(userId: string, password: string) {
   try {
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     // Verificar senha
     // (em produção, fazer isso via RPC seguro do Supabase)
@@ -101,7 +104,8 @@ export async function disable2FA(userId: string, password: string) {
 export async function validateTOTP(userId: string, token: string): Promise<boolean> {
   try {
     const speakeasy = require('speakeasy');
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     const { data: twoFA } = await supabase
       .from('user_2fa')
@@ -140,7 +144,8 @@ export async function generateBackupCodes(count: number = 10): Promise<string[]>
 
 export async function useBackupCode(userId: string, code: string): Promise<boolean> {
   try {
-    const supabase = supabaseServer();
+    import pb from '@/lib/pocketbase';
+  // TODO: Migrate to PocketBase
 
     const { data: twoFA } = await supabase
       .from('user_2fa')
